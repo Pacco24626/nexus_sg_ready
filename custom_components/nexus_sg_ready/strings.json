@@ -1,0 +1,236 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Smart Grid della pompa di calore",
+        "description": "Collega i due contatti SG-Ready e le misure: il modulo propone le entita' riconosciute dal nome. Alla prima installazione l'integrazione parte in «osservazione»: decide e scrive il perche' nel sensore «Stadio richiesto», ma non tocca i contatti finche' non scegli «automatico» nella select «Modalita'».",
+        "data": {
+          "nome": "Nome"
+        },
+        "sections": {
+          "contatti": {
+            "name": "Contatti SG",
+            "description": "Contatto 1 = accensione consigliata (IN11 sull'Ecodan). Contatto 1 e 2 insieme = comando di accensione (IN12). Il solo contatto 2 blocca la macchina: l'integrazione non lo chiede mai e lo chiude solo dopo aver visto chiuso il contatto 1.",
+            "data": {
+              "contatto_1": "Contatto 1",
+              "contatto_2": "Contatto 2",
+              "correggi_blocco": "Correggi il blocco"
+            },
+            "data_description": {
+              "contatto_2": "Serve solo per lo stadio 2.",
+              "correggi_blocco": "Se trova il solo contatto 2 chiuso lo riapre dopo pochi secondi, chiunque l'abbia chiuso, e lo segnala."
+            }
+          },
+          "rete": {
+            "name": "Rete",
+            "description": "Lo scambio con il contatore: da qui si ricava quanto si immette in rete.",
+            "data": {
+              "scambio_rete": "Scambio con la rete",
+              "segno_rete": "Convenzione del contatore"
+            },
+            "data_description": {
+              "segno_rete": "Proposta da Nexus Fotovoltaico, se legge lo stesso scambio."
+            }
+          },
+          "pompa": {
+            "name": "Pompa di calore",
+            "description": "Servono a calcolare l'esubero al lordo della pompa (cosi' lo stadio non si spegne quando la pompa parte) e a tenere lo stadio fino a fine ciclo.",
+            "data": {
+              "potenza_pdc": "Potenza assorbita dalla pompa",
+              "compressore": "Compressore attivo",
+              "temperatura_acs": "Temperatura del bollitore",
+              "potenza_stimata": "Potenza stimata in marcia",
+              "acs_massima": "Attiva solo con il bollitore sotto"
+            },
+            "data_description": {
+              "potenza_pdc": "Facoltativa, da una pinza o da un contatore. Senza, si usa la potenza stimata quando il compressore e' acceso.",
+              "potenza_stimata": "Quanto assorbe la pompa quando gira, se non c'e' una misura. Conta anche quando la pompa e' partita da sola: cosi' un ciclo gia' in corso col sole si allunga.",
+              "acs_massima": "Evita i rabbocchi piccoli: con il bollitore sopra questa temperatura lo stadio 1 non si attiva. Serve la temperatura del bollitore."
+            }
+          },
+          "stadi": {
+            "name": "Stadi",
+            "description": "Le soglie sono sull'esubero lordo: immissione in rete piu' la potenza della pompa.",
+            "data": {
+              "soglia_1": "Esubero per lo stadio 1",
+              "isteresi": "Isteresi di rilascio",
+              "stadio_2": "Abilita lo stadio 2",
+              "soglia_2": "Esubero per lo stadio 2"
+            },
+            "data_description": {
+              "isteresi": "Uno stadio si rilascia quando l'esubero scende sotto la sua soglia meno questo valore.",
+              "stadio_2": "Chiude anche il contatto 2. Sull'Ecodan porta l'acqua calda al massimo del bollitore, anche con la resistenza elettrica."
+            }
+          },
+          "tempi": {
+            "name": "Tempi e fascia oraria",
+            "description": "Fuori fascia non si attiva niente e lo stadio si rilascia. I ritardi evitano di inseguire le nuvole; durata minima e pausa evitano cicli brevi della pompa.",
+            "data": {
+              "ora_inizio": "Inizio fascia",
+              "ora_fine": "Fine fascia",
+              "ritardo_attivazione": "Ritardo di attivazione",
+              "ritardo_rilascio": "Ritardo di rilascio",
+              "durata_minima": "Durata minima di uno stadio",
+              "pausa_minima": "Pausa minima dopo il rilascio",
+              "tenuta_ciclo": "Tieni fino a fine ciclo",
+              "tenuta_massima": "Tenuta massima"
+            },
+            "data_description": {
+              "tenuta_ciclo": "Se la pompa sta scaldando, lo stadio non si rilascia finche' non si ferma: a meta' ciclo la macchina si fermerebbe con l'acqua gia' sopra l'obiettivo normale.",
+              "tenuta_massima": "Oltre questo tempo la tenuta cade anche se la pompa gira ancora."
+            }
+          }
+        }
+      }
+    },
+    "error": {
+      "mancano_obbligatorie": "Il contatto 1 e lo scambio con la rete sono obbligatori.",
+      "entita_ripetuta": "La stessa entita' e' scelta per due voci diverse.",
+      "stadio_2_senza_contatto": "Per lo stadio 2 serve il contatto 2.",
+      "soglie_invertite": "L'esubero per lo stadio 2 deve essere piu' alto di quello per lo stadio 1.",
+      "fascia_vuota": "Inizio e fine della fascia oraria coincidono.",
+      "manca_pompa": "Collega almeno il compressore o la potenza della pompa: senza, l'esubero sarebbe solo netto e la pompa che parte rilascerebbe da sola lo stadio.",
+      "contatto_in_uso": "Questo contatto e' gia' comandato da un'altra voce di Nexus SG Ready.",
+      "contatto_chiuso": "Stai togliendo o cambiando un contatto che adesso e' chiuso: la voce ricaricata non lo vedrebbe piu'. Aprilo prima (con la modalita' «spento» se lo comanda questa integrazione, altrimenti dal sistema che lo comanda), poi riprova."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Contatti, misure, soglie e tempi",
+        "description": "Cambia contatti, misure, soglie e tempi. Il nome si cambia rinominando la voce.",
+        "sections": {
+          "contatti": {
+            "name": "Contatti SG",
+            "description": "Contatto 1 = accensione consigliata (IN11 sull'Ecodan). Contatto 1 e 2 insieme = comando di accensione (IN12). Il solo contatto 2 blocca la macchina: l'integrazione non lo chiede mai e lo chiude solo dopo aver visto chiuso il contatto 1.",
+            "data": {
+              "contatto_1": "Contatto 1",
+              "contatto_2": "Contatto 2",
+              "correggi_blocco": "Correggi il blocco"
+            },
+            "data_description": {
+              "contatto_2": "Serve solo per lo stadio 2.",
+              "correggi_blocco": "Se trova il solo contatto 2 chiuso lo riapre dopo pochi secondi, chiunque l'abbia chiuso, e lo segnala."
+            }
+          },
+          "rete": {
+            "name": "Rete",
+            "description": "Lo scambio con il contatore: da qui si ricava quanto si immette in rete.",
+            "data": {
+              "scambio_rete": "Scambio con la rete",
+              "segno_rete": "Convenzione del contatore"
+            },
+            "data_description": {
+              "segno_rete": "Proposta da Nexus Fotovoltaico, se legge lo stesso scambio."
+            }
+          },
+          "pompa": {
+            "name": "Pompa di calore",
+            "description": "Servono a calcolare l'esubero al lordo della pompa (cosi' lo stadio non si spegne quando la pompa parte) e a tenere lo stadio fino a fine ciclo.",
+            "data": {
+              "potenza_pdc": "Potenza assorbita dalla pompa",
+              "compressore": "Compressore attivo",
+              "temperatura_acs": "Temperatura del bollitore",
+              "potenza_stimata": "Potenza stimata in marcia",
+              "acs_massima": "Attiva solo con il bollitore sotto"
+            },
+            "data_description": {
+              "potenza_pdc": "Facoltativa, da una pinza o da un contatore. Senza, si usa la potenza stimata quando il compressore e' acceso.",
+              "potenza_stimata": "Quanto assorbe la pompa quando gira, se non c'e' una misura. Conta anche quando la pompa e' partita da sola: cosi' un ciclo gia' in corso col sole si allunga.",
+              "acs_massima": "Evita i rabbocchi piccoli: con il bollitore sopra questa temperatura lo stadio 1 non si attiva. Serve la temperatura del bollitore."
+            }
+          },
+          "stadi": {
+            "name": "Stadi",
+            "description": "Le soglie sono sull'esubero lordo: immissione in rete piu' la potenza della pompa.",
+            "data": {
+              "soglia_1": "Esubero per lo stadio 1",
+              "isteresi": "Isteresi di rilascio",
+              "stadio_2": "Abilita lo stadio 2",
+              "soglia_2": "Esubero per lo stadio 2"
+            },
+            "data_description": {
+              "isteresi": "Uno stadio si rilascia quando l'esubero scende sotto la sua soglia meno questo valore.",
+              "stadio_2": "Chiude anche il contatto 2. Sull'Ecodan porta l'acqua calda al massimo del bollitore, anche con la resistenza elettrica."
+            }
+          },
+          "tempi": {
+            "name": "Tempi e fascia oraria",
+            "description": "Fuori fascia non si attiva niente e lo stadio si rilascia. I ritardi evitano di inseguire le nuvole; durata minima e pausa evitano cicli brevi della pompa.",
+            "data": {
+              "ora_inizio": "Inizio fascia",
+              "ora_fine": "Fine fascia",
+              "ritardo_attivazione": "Ritardo di attivazione",
+              "ritardo_rilascio": "Ritardo di rilascio",
+              "durata_minima": "Durata minima di uno stadio",
+              "pausa_minima": "Pausa minima dopo il rilascio",
+              "tenuta_ciclo": "Tieni fino a fine ciclo",
+              "tenuta_massima": "Tenuta massima"
+            },
+            "data_description": {
+              "tenuta_ciclo": "Se la pompa sta scaldando, lo stadio non si rilascia finche' non si ferma: a meta' ciclo la macchina si fermerebbe con l'acqua gia' sopra l'obiettivo normale.",
+              "tenuta_massima": "Oltre questo tempo la tenuta cade anche se la pompa gira ancora."
+            }
+          }
+        }
+      }
+    },
+    "error": {
+      "mancano_obbligatorie": "Il contatto 1 e lo scambio con la rete sono obbligatori.",
+      "entita_ripetuta": "La stessa entita' e' scelta per due voci diverse.",
+      "stadio_2_senza_contatto": "Per lo stadio 2 serve il contatto 2.",
+      "soglie_invertite": "L'esubero per lo stadio 2 deve essere piu' alto di quello per lo stadio 1.",
+      "fascia_vuota": "Inizio e fine della fascia oraria coincidono.",
+      "manca_pompa": "Collega almeno il compressore o la potenza della pompa: senza, l'esubero sarebbe solo netto e la pompa che parte rilascerebbe da sola lo stadio.",
+      "contatto_in_uso": "Questo contatto e' gia' comandato da un'altra voce di Nexus SG Ready.",
+      "contatto_chiuso": "Stai togliendo o cambiando un contatto che adesso e' chiuso: la voce ricaricata non lo vedrebbe piu'. Aprilo prima (con la modalita' «spento» se lo comanda questa integrazione, altrimenti dal sistema che lo comanda), poi riprova."
+    }
+  },
+  "selector": {
+    "segno_rete": {
+      "options": {
+        "immissione_positiva": "Positivo quando si immette in rete",
+        "prelievo_positivo": "Positivo quando si preleva dalla rete"
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "modalita": {
+        "name": "Modalita'",
+        "state": {
+          "automatico": "Automatico",
+          "osservazione": "Osservazione",
+          "spento": "Spento"
+        }
+      }
+    },
+    "sensor": {
+      "stadio_richiesto": {
+        "name": "Stadio richiesto",
+        "state": {
+          "normale": "Normale",
+          "consigliato": "Accensione consigliata",
+          "comando": "Comando di accensione"
+        }
+      },
+      "stadio_contatti": {
+        "name": "Stadio dei contatti",
+        "state": {
+          "normale": "Normale",
+          "consigliato": "Accensione consigliata",
+          "comando": "Comando di accensione",
+          "blocco": "Blocco"
+        }
+      },
+      "esubero_lordo": {
+        "name": "Esubero lordo"
+      }
+    },
+    "binary_sensor": {
+      "anomalia": {
+        "name": "Anomalia contatti"
+      }
+    }
+  }
+}

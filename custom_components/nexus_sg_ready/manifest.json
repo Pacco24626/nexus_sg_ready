@@ -1,0 +1,15 @@
+{
+  "domain": "nexus_sg_ready",
+  "name": "Nexus SG Ready",
+  "codeowners": [
+    "@Pacco24626"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/Pacco24626/nexus_sg_ready",
+  "integration_type": "device",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/Pacco24626/nexus_sg_ready/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

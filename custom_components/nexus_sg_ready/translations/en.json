@@ -1,0 +1,236 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Heat pump Smart Grid",
+        "description": "Link the two SG-Ready contacts and the measurements: the form suggests the entities recognised by name. On first install the integration starts in «observation»: it decides and writes why in the «Requested stage» sensor, but does not touch the contacts until you pick «automatic» in the «Mode» select.",
+        "data": {
+          "nome": "Name"
+        },
+        "sections": {
+          "contatti": {
+            "name": "SG contacts",
+            "description": "Contact 1 = switch-on recommendation (IN11 on Ecodan). Contacts 1 and 2 together = switch-on command (IN12). Contact 2 alone blocks the machine: the integration never requests it and closes contact 2 only after seeing contact 1 closed.",
+            "data": {
+              "contatto_1": "Contact 1",
+              "contatto_2": "Contact 2",
+              "correggi_blocco": "Correct the block state"
+            },
+            "data_description": {
+              "contatto_2": "Only needed for stage 2.",
+              "correggi_blocco": "If contact 2 is found closed alone it is reopened after a few seconds, whoever closed it, and reported."
+            }
+          },
+          "rete": {
+            "name": "Grid",
+            "description": "The grid exchange from the meter: it tells how much is exported.",
+            "data": {
+              "scambio_rete": "Grid exchange",
+              "segno_rete": "Meter sign convention"
+            },
+            "data_description": {
+              "segno_rete": "Suggested from Nexus Fotovoltaico when it reads the same exchange."
+            }
+          },
+          "pompa": {
+            "name": "Heat pump",
+            "description": "Used to compute the surplus including the heat pump's own draw (so the stage does not drop when the pump starts) and to hold the stage until the cycle ends.",
+            "data": {
+              "potenza_pdc": "Heat pump power draw",
+              "compressore": "Compressor running",
+              "temperatura_acs": "Hot water tank temperature",
+              "potenza_stimata": "Estimated power while running",
+              "acs_massima": "Only activate with the tank below"
+            },
+            "data_description": {
+              "potenza_pdc": "Optional, from a clamp or a meter. Without it, the estimated power is used while the compressor runs.",
+              "potenza_stimata": "How much the heat pump draws while running, when there is no measurement.",
+              "acs_massima": "Avoids small top-ups: with the tank above this temperature stage 1 is not activated. Needs the tank temperature."
+            }
+          },
+          "stadi": {
+            "name": "Stages",
+            "description": "Thresholds apply to the gross surplus: grid export plus the heat pump power.",
+            "data": {
+              "soglia_1": "Surplus for stage 1",
+              "isteresi": "Release hysteresis",
+              "stadio_2": "Enable stage 2",
+              "soglia_2": "Surplus for stage 2"
+            },
+            "data_description": {
+              "isteresi": "A stage is released when the surplus drops below its threshold minus this value.",
+              "stadio_2": "Also closes contact 2. On Ecodan it heats hot water to the tank maximum, possibly with the electric heater."
+            }
+          },
+          "tempi": {
+            "name": "Timing and time window",
+            "description": "Outside the window nothing is activated and the stage is released. Delays avoid chasing clouds; minimum duration and pause avoid short heat pump cycles.",
+            "data": {
+              "ora_inizio": "Window start",
+              "ora_fine": "Window end",
+              "ritardo_attivazione": "Activation delay",
+              "ritardo_rilascio": "Release delay",
+              "durata_minima": "Minimum stage duration",
+              "pausa_minima": "Minimum pause after release",
+              "tenuta_ciclo": "Hold until the cycle ends",
+              "tenuta_massima": "Maximum hold"
+            },
+            "data_description": {
+              "tenuta_ciclo": "While the heat pump is heating, the stage is not released until it stops: mid-cycle the machine would stop with the water already above the normal target.",
+              "tenuta_massima": "After this time the hold ends even if the heat pump is still running."
+            }
+          }
+        }
+      }
+    },
+    "error": {
+      "mancano_obbligatorie": "Contact 1 and the grid exchange are required.",
+      "entita_ripetuta": "The same entity is chosen for two different fields.",
+      "stadio_2_senza_contatto": "Stage 2 needs contact 2.",
+      "soglie_invertite": "The stage 2 surplus must be higher than the stage 1 surplus.",
+      "fascia_vuota": "Window start and end are the same.",
+      "manca_pompa": "Link at least the compressor or the heat pump power: without them the surplus would be net only, and the pump starting would release the stage by itself.",
+      "contatto_in_uso": "This contact is already driven by another Nexus SG Ready entry.",
+      "contatto_chiuso": "You are removing or changing a contact that is closed right now: the reloaded entry would no longer see it. Open it first (with the «off» mode if this integration drives it, otherwise from the system that drives it), then try again."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Contacts, measurements, thresholds and timing",
+        "description": "Change contacts, measurements, thresholds and timing. Rename the entry to change its name.",
+        "sections": {
+          "contatti": {
+            "name": "SG contacts",
+            "description": "Contact 1 = switch-on recommendation (IN11 on Ecodan). Contacts 1 and 2 together = switch-on command (IN12). Contact 2 alone blocks the machine: the integration never requests it and closes contact 2 only after seeing contact 1 closed.",
+            "data": {
+              "contatto_1": "Contact 1",
+              "contatto_2": "Contact 2",
+              "correggi_blocco": "Correct the block state"
+            },
+            "data_description": {
+              "contatto_2": "Only needed for stage 2.",
+              "correggi_blocco": "If contact 2 is found closed alone it is reopened after a few seconds, whoever closed it, and reported."
+            }
+          },
+          "rete": {
+            "name": "Grid",
+            "description": "The grid exchange from the meter: it tells how much is exported.",
+            "data": {
+              "scambio_rete": "Grid exchange",
+              "segno_rete": "Meter sign convention"
+            },
+            "data_description": {
+              "segno_rete": "Suggested from Nexus Fotovoltaico when it reads the same exchange."
+            }
+          },
+          "pompa": {
+            "name": "Heat pump",
+            "description": "Used to compute the surplus including the heat pump's own draw (so the stage does not drop when the pump starts) and to hold the stage until the cycle ends.",
+            "data": {
+              "potenza_pdc": "Heat pump power draw",
+              "compressore": "Compressor running",
+              "temperatura_acs": "Hot water tank temperature",
+              "potenza_stimata": "Estimated power while running",
+              "acs_massima": "Only activate with the tank below"
+            },
+            "data_description": {
+              "potenza_pdc": "Optional, from a clamp or a meter. Without it, the estimated power is used while the compressor runs.",
+              "potenza_stimata": "How much the heat pump draws while running, when there is no measurement.",
+              "acs_massima": "Avoids small top-ups: with the tank above this temperature stage 1 is not activated. Needs the tank temperature."
+            }
+          },
+          "stadi": {
+            "name": "Stages",
+            "description": "Thresholds apply to the gross surplus: grid export plus the heat pump power.",
+            "data": {
+              "soglia_1": "Surplus for stage 1",
+              "isteresi": "Release hysteresis",
+              "stadio_2": "Enable stage 2",
+              "soglia_2": "Surplus for stage 2"
+            },
+            "data_description": {
+              "isteresi": "A stage is released when the surplus drops below its threshold minus this value.",
+              "stadio_2": "Also closes contact 2. On Ecodan it heats hot water to the tank maximum, possibly with the electric heater."
+            }
+          },
+          "tempi": {
+            "name": "Timing and time window",
+            "description": "Outside the window nothing is activated and the stage is released. Delays avoid chasing clouds; minimum duration and pause avoid short heat pump cycles.",
+            "data": {
+              "ora_inizio": "Window start",
+              "ora_fine": "Window end",
+              "ritardo_attivazione": "Activation delay",
+              "ritardo_rilascio": "Release delay",
+              "durata_minima": "Minimum stage duration",
+              "pausa_minima": "Minimum pause after release",
+              "tenuta_ciclo": "Hold until the cycle ends",
+              "tenuta_massima": "Maximum hold"
+            },
+            "data_description": {
+              "tenuta_ciclo": "While the heat pump is heating, the stage is not released until it stops: mid-cycle the machine would stop with the water already above the normal target.",
+              "tenuta_massima": "After this time the hold ends even if the heat pump is still running."
+            }
+          }
+        }
+      }
+    },
+    "error": {
+      "mancano_obbligatorie": "Contact 1 and the grid exchange are required.",
+      "entita_ripetuta": "The same entity is chosen for two different fields.",
+      "stadio_2_senza_contatto": "Stage 2 needs contact 2.",
+      "soglie_invertite": "The stage 2 surplus must be higher than the stage 1 surplus.",
+      "fascia_vuota": "Window start and end are the same.",
+      "manca_pompa": "Link at least the compressor or the heat pump power: without them the surplus would be net only, and the pump starting would release the stage by itself.",
+      "contatto_in_uso": "This contact is already driven by another Nexus SG Ready entry.",
+      "contatto_chiuso": "You are removing or changing a contact that is closed right now: the reloaded entry would no longer see it. Open it first (with the «off» mode if this integration drives it, otherwise from the system that drives it), then try again."
+    }
+  },
+  "selector": {
+    "segno_rete": {
+      "options": {
+        "immissione_positiva": "Positive when exporting to the grid",
+        "prelievo_positivo": "Positive when importing from the grid"
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "modalita": {
+        "name": "Mode",
+        "state": {
+          "automatico": "Automatic",
+          "osservazione": "Observation",
+          "spento": "Off"
+        }
+      }
+    },
+    "sensor": {
+      "stadio_richiesto": {
+        "name": "Requested stage",
+        "state": {
+          "normale": "Normal",
+          "consigliato": "Switch-on recommendation",
+          "comando": "Switch-on command"
+        }
+      },
+      "stadio_contatti": {
+        "name": "Contacts stage",
+        "state": {
+          "normale": "Normal",
+          "consigliato": "Switch-on recommendation",
+          "comando": "Switch-on command",
+          "blocco": "Block"
+        }
+      },
+      "esubero_lordo": {
+        "name": "Gross surplus"
+      }
+    },
+    "binary_sensor": {
+      "anomalia": {
+        "name": "Contacts anomaly"
+      }
+    }
+  }
+}
