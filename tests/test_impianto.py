@@ -298,6 +298,12 @@ async def main():
         {"motivo", "esubero_lordo"} <= StadioRichiestoSensor._unrecorded_attributes
         and "ultimo_cambio" not in StadioRichiestoSensor._unrecorded_attributes)
 
+    # La modalita' decide se l'impianto comanda o guarda: un comando vocale
+    # generico non deve poterla toccare. La categoria e' cio' che la tiene
+    # fuori dagli assistenti.
+    b.v("la modalita' ha categoria «config», quindi non e' esposta a voce",
+        getattr(ModalitaSelect, "_attr_entity_category", None) == "config")
+
     b.fine()
 
 

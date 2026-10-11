@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -32,6 +33,10 @@ class ModalitaSelect(SelectEntity, RestoreEntity):
     _attr_has_entity_name = True
     _attr_translation_key = "modalita"
     _attr_options = MODALITA
+    # Governa un comportamento, non e' un dispositivo da accendere: con la
+    # categoria «config» Home Assistant non lo espone agli assistenti vocali,
+    # dove un comando generico se lo porterebbe via insieme alle lampade.
+    _attr_entity_category = EntityCategory.CONFIG
 
     def __init__(self, impianto: Impianto) -> None:
         self._impianto = impianto

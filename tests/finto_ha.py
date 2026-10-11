@@ -78,6 +78,7 @@ class _Platform(str):
 
 
 class _EntityCategory(str):
+    CONFIG = "config"
     DIAGNOSTIC = "diagnostic"
 
 
