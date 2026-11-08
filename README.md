@@ -103,10 +103,11 @@ all'automatico **disattiva le altre logiche** che comandano gli stessi relè.
 
 ## Installazione
 
-1. HACS → menu ⋮ → **Repository personalizzate**
-2. URL `https://github.com/Pacco24626/nexus_sg_ready`, categoria **Integration**
-3. Installa e **riavvia Home Assistant**
-4. **Impostazioni → Dispositivi e servizi → Aggiungi integrazione → Nexus SG Ready**
+1. In **HACS** — da Home Assistant 2026.11 si chiama **Marketplace**, in *Impostazioni* — cerca **Nexus SG Ready** e installala
+2. **Riavvia Home Assistant**
+3. **Impostazioni → Dispositivi e servizi → Aggiungi integrazione → Nexus SG Ready**
+
+> Per provare una versione non ancora pubblicata si può aggiungere questo repository a mano, come *repository personalizzato* di categoria **Integration**: `https://github.com/Pacco24626/nexus_sg_ready`
 
 ## Configurazione
 
